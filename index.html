@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>泰语猜词游戏 - 预置词汇库版</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans+Thai:wght@400;500;700&family=Sarabun:wght@400;500;700&family=Chakra+Petch:wght@400;500;700&family=Maitree:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', 'Noto Sans Thai', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff, #e6f7ff);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: linear-gradient(to right, #bd2130, #d9534f);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="10" y="30" font-size="14" fill="rgba(255,255,255,0.1)">สวัสดี</text><text x="30" y="60" font-size="14" fill="rgba(255,255,255,0.1)">ขอบคุณ</text><text x="60" y="90" font-size="14" fill="rgba(255,255,255,0.1)">อร่อย</text></svg>');
+            opacity: 0.5;
+        }
+        
+        h1 {
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            position: relative;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            min-width: 120px;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .word-display {
+            padding: 50px 20px;
+            text-align: center;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #f8f9fa;
+            position: relative;
+        }
+        
+        .current-thai {
+            font-family: 'Noto Sans Thai', sans-serif;
+            font-size: 3.8rem;
+            font-weight: 700;
+            color: #bd2130;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            min-height: 80px;
+            transition: all 0.3s;
+        }
+        
+        .font-noto-thai {
+            font-family: 'Noto Sans Thai', sans-serif;
+        }
+        
+        .font-sarabun {
+            font-family: 'Sarabun', sans-serif;
+        }
+        
+        .font-chakra-petch {
+            font-family: 'Chakra Petch', sans-serif;
+        }
+        
+        .font-maitree {
+            font-family: 'Maitree', serif;
+        }
+        
+        .current-chinese {
+            font-size: 2.7rem;
+            color: #333;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+        }
+        
+        .game-instruction {
+            background: #e8f5e9;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            max-width: 80%;
+            text-align: center;
+        }
+        
+        .controls {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            width: 100%;
+        }
+        
+        .next-btn {
+            background: linear-gradient(to right, #4caf50, #2e7d32);
+            color: white;
+            border: none;
+            padding: 16px 50px;
+            font-size: 1.4rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .next-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 9px 25px rgba(76, 175, 80, 0.4);
+        }
+        
+        .next-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .next-btn:disabled {
+            background: linear-gradient(to right, #9e9e9e, #757575);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .vocab-manager {
+            padding: 30px;
+            background: #fff;
+            display: none; /* 默认隐藏 */
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #444;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .vocab-input {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-family: 'Noto Sans SC', 'Noto Sans Thai', sans-serif;
+            font-size: 1.1rem;
+            resize: vertical;
+            margin-bottom: 20px;
+        }
+        
+        .vocab-input:focus {
+            border-color: #4caf50;
+            outline: none;
+        }
+        
+        .instructions {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        
+        .instructions h3 {
+            color: #2e7d32;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 5px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .save-btn {
+            background: #2196f3;
+            color: white;
+        }
+        
+        .save-btn:hover {
+            background: #0d8aee;
+        }
+        
+        .reset-btn {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+        
+        .reset-btn:hover {
+            background: #eee;
+        }
+        
+        .example-btn {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .example-btn:hover {
+            background: #f57c00;
+        }
+        
+        .reset-game-btn {
+            background: #f44336;
+            color: white;
+        }
+        
+        .reset-game-btn:hover {
+            background: #e53935;
+        }
+        
+        .toggle-vocab-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+        
+        .toggle-vocab-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .font-selector {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .font-option {
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .font-option:hover {
+            background: #e0e0e0;
+        }
+        
+        .font-option.active {
+            background: #4caf50;
+            color: white;
+            border-color: #2e7d32;
+        }
+        
+        .font-label {
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .vocab-count {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-size: 0.9rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+        
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        .fadeInUp {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        @media (max-width: 768px) {
+            .current-thai {
+                font-size: 3rem;
+            }
+            
+            .current-chinese {
+                font-size: 2.2rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .stat-box {
+                min-width: 100px;
+                padding: 8px 15px;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .current-thai {
+                font-size: 2.5rem;
+            }
+            
+            .current-chinese {
+                font-size: 1.8rem;
+            }
+            
+            .next-btn {
+                padding: 14px 30px;
+                font-size: 1.2rem;
+            }
+            
+            .stats {
+                gap: 15px;
+            }
+            
+            .stat-box {
+                min-width: 90px;
+                padding: 6px 10px;
+            }
+            
+            .stat-value {
+                font-size: 1.3rem;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .font-option {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="vocab-count">词汇库: 102个词</div>
+            <button class="toggle-vocab-btn" id="toggle-vocab-btn">
+                <i class="fas fa-cog"></i> 管理词汇库
+            </button>
+            
+            <h1>泰语猜词游戏</h1>
+            <p class="subtitle">您的词汇库已预置在程序中，无需重复输入</p>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="total-count">102</div>
+                    <div class="stat-label">总词汇数</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="remaining-count">102</div>
+                    <div class="stat-label">剩余词汇</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="used-count">0</div>
+                    <div class="stat-label">已用词汇</div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="word-display">
+            <div class="font-label">选择泰文字体：</div>
+            <div class="font-selector">
+                <div class="font-option active" data-font="font-noto-thai">Noto Sans Thai</div>
+                <div class="font-option" data-font="font-sarabun">Sarabun</div>
+                <div class="font-option" data-font="font-chakra-petch">Chakra Petch</div>
+                <div class="font-option" data-font="font-maitree">Maitree</div>
+            </div>
+            
+            <div class="current-thai font-noto-thai" id="current-thai">ต้นไม้</div>
+            <div class="current-chinese" id="current-chinese">树</div>
+            <div class="game-instruction">请描述或猜测这个词语的意思</div>
+            
+            <button class="next-btn" id="next-btn">
+                <i class="fas fa-random"></i> 随机换词
+            </button>
+        </div>
+        
+        <div class="vocab-manager" id="vocab-manager">
+            <h2 class="section-title">词汇库管理</h2>
+            
+            <div class="instructions">
+                <h3><i class="fas fa-info-circle"></i> 使用说明：</h3>
+                <ul>
+                    <li>您的102个词汇已预置在程序中</li>
+                    <li>点击"随机换词"按钮切换到下一个未使用的词汇</li>
+                    <li>每个词汇只会出现一次，直到全部词汇用完</li>
+                    <li>点击"重置游戏"可以重新开始使用所有词汇</li>
+                    <li>您仍然可以修改词汇库并保存</li>
+                </ul>
+            </div>
+            
+            <textarea class="vocab-input" id="vocab-input" placeholder="您的词汇库已预置..."></textarea>
+            
+            <div class="btn-group">
+                <button class="btn save-btn" id="save-btn">
+                    <i class="fas fa-save"></i> 保存词汇库
+                </button>
+                <button class="btn reset-btn" id="reset-btn">
+                    <i class="fas fa-undo"></i> 清空
+                </button>
+                <button class="btn reset-game-btn" id="reset-game-btn">
+                    <i class="fas fa-sync-alt"></i> 重置游戏
+                </button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>泰语角活动专用工具 | 预置102个词汇 | 支持多种泰文字体切换</p>
+        </footer>
+    </div>
+
+    <script>
+        // 预置词汇库（根据您提供的102个词汇）
+        const presetVocabulary = [
+            "ต้นไม้/树",
+            "โทรศัพท์/电话",
+            "หูฟัง/耳机",
+            "รถไฟฟ้า/轻轨",
+            "โรงหนัง/电影院",
+            "น้ำแข็ง/冰块",
+            "กางเกง/裤子",
+            "ช้อนส้อม/餐具",
+            "ห้องเรียน/教室",
+            "ตั๋วรถ/车票",
+            "อาจารย์/教师",
+            "นักบิน/飞行员",
+            "คนขับ/司机",
+            "เพื่อนบ้าน/邻居",
+            "นักร้อง/歌手",
+            "มือถือ/手机",
+            "ขนมจีน/米线",
+            "เล่นน้ำ/玩水",
+            "ฟังเพลง/听音乐",
+            "วาดรูป/画画",
+            "ซื้อตั๋ว/买票",
+            "เปิดไฟ/开灯",
+            "ประตู/门",
+            "เดินเล่น/散步",
+            "ขึ้นรถ/上车",
+            "เขียนชื่อ/写名字",
+            "ล้างมือ/洗手",
+            "รอเพื่อน/等朋友",
+            "กอดกัน/拥抱",
+            "หัวเราะ/笑",
+            "วิ่งเร็ว/跑得快",
+            "นอนหลับ/睡觉",
+            "กล่องข้าว/饭盒",
+            "งานแต่ง/婚礼",
+            "หนังสือพิมพ์/报纸",
+            "เครื่องบิน/飞机",
+            "ขยัน/勤奋",
+            "น่ากลัว/可怕",
+            "เข้มข้น/浓烈",
+            "ทำกับข้าว/做饭",
+            "สับสน/混乱",
+            "มืดมน/昏暗",
+            "น่ากิน/可口",
+            "เงียบสงบ/安静",
+            "แว่นตา/眼镜",
+            "กระเป๋า/包包",
+            "สนามบิน/机场",
+            "รถตู้/面包车",
+            "เตียงนอน/床铺",
+            "หมวกกันน็อก/头盔",
+            "เปิดเพลง/放音乐",
+            "น้ำผลไม้/果汁",
+            "รถติด/堵车",
+            "ปั๊มน้ำมัน/加油站",
+            "ต่อคิว/排队",
+            "ไลฟ์สด/直播",
+            "อาหารเดลิเวอรี่/外卖",
+            "เงินสด/现金",
+            "ส่วนลด/打折",
+            "ข้าวผัด/炒饭",
+            "แตงโม/西瓜",
+            "ถุงพลาสติก/塑料袋",
+            "ไฟดับ/停电",
+            "กุญแจ/钥匙",
+            "ทิ้งขยะ/倒垃圾",
+            "เครื่องซักผ้า/洗衣机",
+            "ยุง/蚊子",
+            "หน้ากาก/口罩",
+            "เหงื่อออก/流汗",
+            "เชียงใหม่/清迈",
+            "ก๋วยเตี๋ยวเรือ/船面",
+            "กล้วยทอด/炸芭蕉",
+            "คมนาคม/交通",
+            "ประชุม/开会",
+            "เงินเดือน/工资",
+            "สัมภาษณ์งาน/面试",
+            "สร้อยคอ/项链",
+            "นาฬิกา/手表",
+            "ต่างหู/耳环",
+            "โมโห/生气",
+            "นักแสดง/演员",
+            "ละคร/电视剧",
+            "แหวนทอง/金戒指",
+            "ตัดผม/剪发",
+            "ของแท้/真货",
+            "สีขาว/白色",
+            "เป็นหวัด/感冒",
+            "อบอุ่น/温暖",
+            "เมารถ/晕车",
+            "พระอาทิตย์ตก/日落",
+            "ฟ้าผ่า/闪电",
+            "กดไลค์/点赞",
+            "พัสดุ/快递",
+            "การเดินทาง/旅行",
+            "บริการ/服务",
+            "ปลอดภัย/安全",
+            "ภาษา/语言",
+            "ห้องสมุด/图书馆",
+            "หอพัก/宿舍",
+            "ฝึกงาน/实习",
+            "ฉลาด/聪明"
+        ];
+        
+        // 游戏状态
+        let vocabulary = [];
+        let usedWords = [];
+        let remainingWords = [];
+        let vocabManagerVisible = false;
+        let currentFont = 'font-noto-thai';
+        
+        // DOM元素
+        const thaiElement = document.getElementById('current-thai');
+        const chineseElement = document.getElementById('current-chinese');
+        const nextBtn = document.getElementById('next-btn');
+        const vocabInput = document.getElementById('vocab-input');
+        const saveBtn = document.getElementById('save-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const resetGameBtn = document.getElementById('reset-game-btn');
+        const toggleVocabBtn = document.getElementById('toggle-vocab-btn');
+        const vocabManager = document.getElementById('vocab-manager');
+        const totalCountElement = document.getElementById('total-count');
+        const remainingCountElement = document.getElementById('remaining-count');
+        const usedCountElement = document.getElementById('used-count');
+        const fontOptions = document.querySelectorAll('.font-option');
+        
+        // 初始化游戏
+        function initGame() {
+            // 使用预置词汇库
+            vocabulary = [...presetVocabulary];
+            usedWords = [];
+            remainingWords = [...vocabulary];
+            vocabInput.value = vocabulary.join('\n');
+            updateStats();
+            getRandomWord();
+            
+            // 设置字体切换事件
+            fontOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // 移除所有选项的active类
+                    fontOptions.forEach(opt => opt.classList.remove('active'));
+                    // 给当前选项添加active类
+                    this.classList.add('active');
+                    // 更新当前字体
+                    currentFont = this.dataset.font;
+                    // 应用新字体
+                    thaiElement.className = 'current-thai ' + currentFont;
+                });
+            });
+        }
+        
+        // 获取随机词汇
+        function getRandomWord() {
+            if (remainingWords.length === 0) {
+                thaiElement.textContent = "เสร็จสิ้น!";
+                chineseElement.textContent = "全部词汇已用完！";
+                nextBtn.disabled = true;
+                return;
+            }
+            
+            const randomIndex = Math.floor(Math.random() * remainingWords.length);
+            const selectedWord = remainingWords[randomIndex];
+            const [thai, chinese] = selectedWord.split('/');
+            
+            // 移动到已使用列表
+            usedWords.push(selectedWord);
+            remainingWords.splice(randomIndex, 1);
+            
+            thaiElement.textContent = thai;
+            chineseElement.textContent = chinese;
+            
+            // 确保应用当前选择的字体
+            thaiElement.className = 'current-thai ' + currentFont;
+            
+            // 添加动画效果
+            thaiElement.classList.remove('fadeInUp');
+            chineseElement.classList.remove('fadeInUp');
+            setTimeout(() => {
+                thaiElement.classList.add('fadeInUp');
+                chineseElement.classList.add('fadeInUp');
+            }, 10);
+            
+            updateStats();
+            nextBtn.disabled = remainingWords.length === 0;
+        }
+        
+        // 更新统计信息
+        function updateStats() {
+            totalCountElement.textContent = vocabulary.length;
+            remainingCountElement.textContent = remainingWords.length;
+            usedCountElement.textContent = usedWords.length;
+        }
+        
+        // 保存词汇库
+        function saveVocabulary() {
+            const input = vocabInput.value.trim();
+            if (!input) return;
+            
+            const newVocab = input.split('\n').filter(line => line.includes('/'));
+            vocabulary = [...newVocab];
+            usedWords = [];
+            remainingWords = [...vocabulary];
+            updateStats();
+            getRandomWord();
+            nextBtn.disabled = false;
+            
+            // 显示保存成功效果
+            saveBtn.innerHTML = '<i class="fas fa-check"></i> 已保存';
+            saveBtn.style.background = '#2e7d32';
+            setTimeout(() => {
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> 保存词汇库';
+                saveBtn.style.background = '#2196f3';
+            }, 1500);
+        }
+        
+        // 重置游戏（不改变词汇库）
+        function resetGame() {
+            usedWords = [];
+            remainingWords = [...vocabulary];
+            updateStats();
+            getRandomWord();
+            nextBtn.disabled = false;
+            
+            // 显示重置效果
+            resetGameBtn.innerHTML = '<i class="fas fa-check"></i> 已重置';
+            resetGameBtn.style.background = '#2e7d32';
+            setTimeout(() => {
+                resetGameBtn.innerHTML = '<i class="fas fa-sync-alt"></i> 重置游戏';
+                resetGameBtn.style.background = '#f44336';
+            }, 1500);
+        }
+        
+        // 切换词汇库管理界面
+        function toggleVocabManager() {
+            vocabManagerVisible = !vocabManagerVisible;
+            if (vocabManagerVisible) {
+                vocabManager.style.display = 'block';
+                toggleVocabBtn.innerHTML = '<i class="fas fa-times"></i> 关闭管理';
+                toggleVocabBtn.style.background = '#444';
+            } else {
+                vocabManager.style.display = 'none';
+                toggleVocabBtn.innerHTML = '<i class="fas fa-cog"></i> 管理词汇库';
+                toggleVocabBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+            }
+        }
+        
+        // 事件监听
+        document.addEventListener('DOMContentLoaded', initGame);
+        
+        nextBtn.addEventListener('click', getRandomWord);
+        
+        saveBtn.addEventListener('click', saveVocabulary);
+        
+        resetBtn.addEventListener('click', () => {
+            if (confirm("确定要清空词汇库吗？")) {
+                vocabInput.value = '';
+                vocabulary = [];
+                usedWords = [];
+                remainingWords = [];
+                updateStats();
+                thaiElement.textContent = "โปรดเพิ่มคำศัพท์";
+                chineseElement.textContent = "请添加词汇";
+            }
+        });
+        
+        resetGameBtn.addEventListener('click', resetGame);
+        
+        toggleVocabBtn.addEventListener('click', toggleVocabManager);
+    </script>
+</body>
+</html>
